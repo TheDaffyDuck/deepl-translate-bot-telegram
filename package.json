@@ -2,13 +2,13 @@
   "name": "deepl-translate-bot-telegram",
   "version": "1.0.0",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "main": "dist/index.js",
   "packageManager": "yarn@1.22.21",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
+    "dev": "ts-node-esm src/index.ts",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write ."
   },
