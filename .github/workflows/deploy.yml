@@ -3,6 +3,8 @@ name: Deploy Deepl Bot to VPS
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'README.md'
 
 jobs:
   deploy:
