@@ -31,9 +31,11 @@ bot.on('message', async (msg) => {
     const { translated } = await translate(text, ...PAIR);
     await bot.sendMessage(chatId, translated);
   } catch (err: unknown) {
-    console.error('Translate error:', err);
-
     const e = err as CodedError; // we control what translate() throws
+
+    console.error('\n[❌ Translate error]');
+    if (e.code) console.error(`Code: ${e.code}`);
+    console.error(`Message: ${e.message}\n`);
 
     const reply =
       e?.code === TranslateErrorEnum.LANG_DETECT
