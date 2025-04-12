@@ -16,16 +16,16 @@ jobs:
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: root,
+          username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "."
           target: "/var/opt/deepl-translate-bot"
 
-      - name: SSH into VPS, install, build and restart
+      - name: SSH into VPS, install, build and restart PM2 app
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
+          username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /var/opt/deepl-translate-bot
