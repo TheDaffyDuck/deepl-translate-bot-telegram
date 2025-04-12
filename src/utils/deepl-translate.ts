@@ -1,9 +1,7 @@
 import * as deepl from 'deepl-node';
 import { TargetLanguageCode } from 'deepl-node';
 import { detectPair, Language } from './lang-detect';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { DEEPL_API_KEY } from '../config/env';
 
 export enum TranslateErrorEnum {
   LANG_DETECT = 'LANG_DETECT',
@@ -14,7 +12,7 @@ export interface CodedError extends Error {
 }
 
 // Single shared DeepL translator instance
-const translator = new deepl.Translator(process.env.DEEPL_API_KEY!);
+const translator = new deepl.Translator(DEEPL_API_KEY);
 
 /**
  * DeepL requires a regional variant when English is the *target* language.

@@ -1,15 +1,13 @@
 import TelegramBot from 'node-telegram-bot-api';
-import * as dotenv from 'dotenv';
 import { CodedError, translate, TranslateErrorEnum } from './utils/deepl-translate';
 import { Language } from './utils/lang-detect';
-
-dotenv.config();
+import { TELEGRAM_BOT_TOKEN } from './config/env';
 
 /* -------------------------------------------------------------------------- */
 /*  Step1. Telegram‑bot initialization                                       */
 /* -------------------------------------------------------------------------- */
 
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN as string, { polling: true });
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
 
 /* -------------------------------------------------------------------------- */
 /*  Step2. Fixed language pair (edit if needed)                              */
