@@ -1,51 +1,45 @@
 import TelegramBot from 'node-telegram-bot-api';
 import * as dotenv from 'dotenv';
-import * as deepl from 'deepl-node';
+import { CodedError, translate, TranslateErrorEnum } from './utils/deepl-translate';
+import { Language } from './utils/lang-detect';
 
 dotenv.config();
 
-// Initialize Telegram bot
+/* -------------------------------------------------------------------------- */
+/*  Step1. Telegram‑bot initialization                                       */
+/* -------------------------------------------------------------------------- */
+
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN as string, { polling: true });
 
-// Initialize DeepL translator
-const translator = new deepl.Translator(process.env.DEEPL_API_KEY as string);
+/* -------------------------------------------------------------------------- */
+/*  Step2. Fixed language pair (edit if needed)                              */
+/* -------------------------------------------------------------------------- */
 
-// Simple language detection based on alphabet
-function detectSourceLang(text: string): deepl.SourceLanguageCode | null {
-  if (/[а-яА-ЯёЁ]/.test(text)) return 'ru';
-  if (/[a-zA-Z]/.test(text)) return 'en';
-  return null;
-}
+const PAIR: [Language, Language] = ['ru', 'en']; // Russian ↔ English
 
-// Supported translation pairs
-const LANGUAGE_PAIRS: Partial<Record<deepl.SourceLanguageCode, deepl.TargetLanguageCode>> = {
-  ru: 'en-US',
-  en: 'ru',
-};
+/* -------------------------------------------------------------------------- */
+/*  Step3. Handle every incoming message                                     */
+/* -------------------------------------------------------------------------- */
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
-
-  if (!text) return;
+  if (!text) return; // ignore non‑text updates
 
   try {
-    const sourceLang = detectSourceLang(text);
+    // translate() auto‑detects which side of the pair the text belongs to
+    const { translated } = await translate(text, ...PAIR);
+    await bot.sendMessage(chatId, translated);
+  } catch (err: unknown) {
+    console.error('Translate error:', err);
 
-    if (!sourceLang || !LANGUAGE_PAIRS[sourceLang]) {
-      await bot.sendMessage(
-        chatId,
-        '⚠️ Unable to detect the message language or it is not supported.',
-      );
-      return;
-    }
+    const e = err as CodedError; // we control what translate() throws
 
-    const targetLang = LANGUAGE_PAIRS[sourceLang];
-    const result = await translator.translateText(text, sourceLang, targetLang);
+    const reply =
+      e?.code === TranslateErrorEnum.LANG_DETECT
+        ? '⚠️ Could not detect the language of the message for the selected pair.'
+        : '❌ Translation error occurred.';
 
-    await bot.sendMessage(chatId, result.text);
-  } catch (error) {
-    console.error('Translation error:', error);
-    await bot.sendMessage(chatId, '❌ An error occurred during translation.');
+    await bot.sendMessage(chatId, reply);
   }
 });
