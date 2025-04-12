@@ -24,6 +24,18 @@ bot.on('message', async (msg) => {
   const text = msg.text;
   if (!text) return; // ignore non‑text updates
 
+  // command entry processing
+  if (text.startsWith('/start')) {
+    await bot.sendMessage(
+      chatId,
+      `🤖 This bot automatically translates between Russian and English.\n` +
+        `Just send a message in one language, and it will be translated to the other.\n\n` +
+        `🤖 Этот бот автоматически переводит между русским и английским языком.\n` +
+        `Просто отправьте сообщение на одном из языков, и он переведёт его на другой.`,
+    );
+    return;
+  }
+
   try {
     // translate() auto‑detects which side of the pair the text belongs to
     const { translated } = await translate(text, ...PAIR);
